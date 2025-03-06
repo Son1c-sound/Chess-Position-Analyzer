@@ -2,6 +2,7 @@
 
 A Node. - python application that interfaces with the Lichess API to monitor chess game state changes. **This is an educational project to demonstrate API integration and event-based programming.**
 
+
 ## Purpose
 
 This project was created as a learning exercise to demonstrate:

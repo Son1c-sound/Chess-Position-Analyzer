@@ -13,10 +13,12 @@ const gameState = {
   username: null,
   pollingInterval: null,
   lastFen: null,
-  lastCheckTime: null
+  lastCheckTime: null,
+  boardUpdated: false  // New flag to track board updates
 };
 
-const POLLING_INTERVAL = 5000; 
+// Increase polling frequency for faster updates
+const POLLING_INTERVAL = 2000; 
 
 async function fetchCurrentGame(username) {
   try {
@@ -89,7 +91,8 @@ function startPolling(username) {
   
   gameState.username = username;
   gameState.isMyTurn = false;
-  gameState.lastFen = null;  
+  gameState.lastFen = null;
+  gameState.boardUpdated = false;
   
   checkGameState();
   
@@ -117,29 +120,43 @@ async function checkGameState() {
   
   if (!processedGame) {
     console.log('No active game found');
+    // Clear game state if no active game
+    if (gameState.currentGameId) {
+      gameState.currentGameId = null;
+      gameState.lastFen = null;
+      gameState.isMyTurn = false;
+    }
     return;
   }
   
+  // Always update the current game ID
   gameState.currentGameId = processedGame.game_id;
   
   const wasPreviouslyMyTurn = gameState.isMyTurn;
   const isNowMyTurn = processedGame.is_my_turn;
   
-  if (!wasPreviouslyMyTurn && isNowMyTurn) {
-    console.log(`It's now your turn in game ${processedGame.game_id}!`);
-    console.log(`Current FEN: ${processedGame.fen}`);
+  // Check if FEN has changed (regardless of whose turn it is)
+  if (gameState.lastFen !== processedGame.fen) {
+    console.log(`Board position updated: ${processedGame.fen}`);
+    console.log(`Turn: ${isNowMyTurn ? 'Your turn' : 'Opponent\'s turn'}`);
     
-    gameState.isMyTurn = true;
     gameState.lastFen = processedGame.fen;
     gameState.lastCheckTime = new Date();
-  } 
-  else if (wasPreviouslyMyTurn && !isNowMyTurn) {
-    console.log(`It's now your opponent's turn`);
-    
-    gameState.isMyTurn = false;
+    gameState.boardUpdated = true;
+  } else {
+    gameState.boardUpdated = false;
+  }
+  
+  // Update turn state
+  if (wasPreviouslyMyTurn !== isNowMyTurn) {
+    if (isNowMyTurn) {
+      console.log(`It's now your turn in game ${processedGame.game_id}!`);
+    } else {
+      console.log(`It's now your opponent's turn`);
+    }
+    gameState.isMyTurn = isNowMyTurn;
   }
 }
-
 
 app.get('/api/current-game', async (req, res) => {
   const { username } = req.query;
@@ -230,6 +247,7 @@ app.get('/api/polling-status', (req, res) => {
     currentGameId: gameState.currentGameId || null,
     isMyTurn: gameState.isMyTurn || false,
     lastFen: gameState.lastFen || null,
+    boardUpdated: gameState.boardUpdated || false,
     lastChecked: lastChecked,
     pollingInterval: POLLING_INTERVAL/1000
   });
