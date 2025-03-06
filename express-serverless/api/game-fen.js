@@ -23,7 +23,7 @@ async function fetchCurrentGame(username) {
   try {
     const response = await fetch(`https://lichess.org/api/account/playing`, {
       headers: {
-        'Authorization': 'Bearer YOUR API KEY',
+        'Authorization': 'Bearer lip_cEHrREJPDi4Q0u1fdx7B',
         'Accept': 'application/json'
       }
     });
