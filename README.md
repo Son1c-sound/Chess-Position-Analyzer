@@ -1,4 +1,4 @@
-# Chess Position Monitor
+# Chess Position Monitor - run on ur conputer easy
 
 get api from lichess.org and attach to server in express-serverless/api
 
