@@ -12,4 +12,13 @@ run python main.py
 
 if game is started u will see live updates in GUI.
 
+
+=========================================================
+
+why node and not flask? 
+
+serverless express more comfortable to build servers (for me) and cost effective to host on vercel
+
+future vision to move this all into web so why not
+
 that it :)
