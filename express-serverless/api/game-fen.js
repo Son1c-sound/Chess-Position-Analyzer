@@ -14,17 +14,16 @@ const gameState = {
   pollingInterval: null,
   lastFen: null,
   lastCheckTime: null,
-  boardUpdated: false  // New flag to track board updates
+  boardUpdated: false 
 };
 
-// Increase polling frequency for faster updates
 const POLLING_INTERVAL = 2000; 
 
 async function fetchCurrentGame(username) {
   try {
     const response = await fetch(`https://lichess.org/api/account/playing`, {
       headers: {
-        'Authorization': 'Bearer lip_123QlFuSnc2IGPJrxmtk',
+        'Authorization': 'Bearer YOUR API KEY',
         'Accept': 'application/json'
       }
     });
@@ -120,7 +119,6 @@ async function checkGameState() {
   
   if (!processedGame) {
     console.log('No active game found');
-    // Clear game state if no active game
     if (gameState.currentGameId) {
       gameState.currentGameId = null;
       gameState.lastFen = null;
@@ -129,13 +127,11 @@ async function checkGameState() {
     return;
   }
   
-  // Always update the current game ID
   gameState.currentGameId = processedGame.game_id;
   
   const wasPreviouslyMyTurn = gameState.isMyTurn;
   const isNowMyTurn = processedGame.is_my_turn;
   
-  // Check if FEN has changed (regardless of whose turn it is)
   if (gameState.lastFen !== processedGame.fen) {
     console.log(`Board position updated: ${processedGame.fen}`);
     console.log(`Turn: ${isNowMyTurn ? 'Your turn' : 'Opponent\'s turn'}`);
@@ -147,7 +143,6 @@ async function checkGameState() {
     gameState.boardUpdated = false;
   }
   
-  // Update turn state
   if (wasPreviouslyMyTurn !== isNowMyTurn) {
     if (isNowMyTurn) {
       console.log(`It's now your turn in game ${processedGame.game_id}!`);
