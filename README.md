@@ -6,7 +6,7 @@
 
 2) after adding api run the server node game-fen.js
 
-3) make post request to this url to start pooling http://localhost:3000/api/start-polling?username=<ur username in lechess>
+3) make post request to this url to start pooling http://localhost:3000/api/start-polling?username=ur username in lechess
 
 4) running server should  already display game status - game found or not 
 
