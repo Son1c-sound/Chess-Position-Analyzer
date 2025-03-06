@@ -1,0 +1,6 @@
+{
+    "version": 2,
+    "builds": [{ "src": "api/game-fen.js", "use": "@vercel/node" }],
+    "routes": [{ "src": "/api/game-fen", "dest": "/api/game-fen.js" }]
+  }
+  
