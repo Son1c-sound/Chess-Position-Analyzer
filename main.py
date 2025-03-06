@@ -11,7 +11,7 @@ import json
 
 stockfish_path = r"C:\Users\makar\Desktop\stockfish\stockfish-windows-x86-64-avx2.exe"
 lichess_server_url = "http://localhost:3000"
-lichess_username = "soniconchess"  # Set your Lichess username here
+lichess_username = "soniconchess" 
 
 class ChessAssistant:
     def __init__(self):
@@ -41,7 +41,6 @@ class ChessAssistant:
         self.init_engine_thread.daemon = True
         self.init_engine_thread.start()
         
-        # Start a thread for Lichess connection
         self.start_lichess_connection()
         
         self.root.mainloop()
@@ -217,7 +216,6 @@ class ChessAssistant:
                 fg="blue"
             )
             self.board_canvas.create_window(200, 200, window=self.no_game_label, tags="message")
-        # Draw the initial board
         self.draw_board()
     
     def on_fen_change(self):
@@ -303,7 +301,7 @@ class ChessAssistant:
             piece = self.board.piece_at(square)
             if piece:
                 col = chess.square_file(square)
-                row = 7 - chess.square_rank(square)  # Flip for display
+                row = 7 - chess.square_rank(square) 
                 x = col * square_size + square_size/2
                 y = row * square_size + square_size/2
                 
@@ -345,7 +343,6 @@ class ChessAssistant:
             return []
     
     def generate_explanation(self, board, analysis):
-        """Generate beginner-friendly explanations for the suggested moves"""
         explanation = "Chess Assistant Analysis:\n\n"
         
         if not analysis:
@@ -606,7 +603,6 @@ class ChessAssistant:
                             else:
                                 has_adjacent_b_pawn = True
             
-            # If we have pawns on this file but no adjacent pawns, they're isolated
             if w_pawns_in_file > 0 and not has_adjacent_w_pawn:
                 w_isolated += w_pawns_in_file
             if b_pawns_in_file > 0 and not has_adjacent_b_pawn:
@@ -619,7 +615,6 @@ class ChessAssistant:
         return detailed
     
     def get_piece_name(self, piece):
-        """Convert a chess.Piece to a beginner-friendly name"""
         if piece is None:
             return "empty square"
         
@@ -635,7 +630,6 @@ class ChessAssistant:
         return f"{color} {piece_types[piece.piece_type]}"
     
     def analyze_current_position(self):
-        """Analyze the current position and update the display"""
         current_fen = self.fen_entry.get().split()[0]  # Get board part of FEN
         board_fen = self.board.board_fen()
         
@@ -670,7 +664,6 @@ class ChessAssistant:
         self.detailed_text.delete(1.0, tk.END)
         self.detailed_text.insert(tk.END, detailed_explanation)
     
-    # Lichess integration methods
     def start_lichess_connection(self):
         """Start polling the Lichess server for game updates"""
         if self.polling_active:
@@ -678,19 +671,16 @@ class ChessAssistant:
             
         self.lichess_status_label.config(text="Status: Connecting to Lichess...")
         
-        # Disable connect button, enable disconnect button
         self.lichess_connect_button.config(state=tk.DISABLED)
         self.lichess_disconnect_button.config(state=tk.NORMAL)
         
         try:
-            # Start polling on the Lichess server
             response = requests.post(f"{lichess_server_url}/api/start-polling?username={self.username}")
             if response.status_code == 200:
                 self.polling_active = True
                 self.lichess_status_label.config(text=f"Status: Connected to Lichess as {self.username}")
                 self.status_label.config(text=f"Connected to Lichess as {self.username}")
                 
-                # Start a thread to check for updates
                 self.lichess_polling_thread = threading.Thread(target=self.check_for_game_updates)
                 self.lichess_polling_thread.daemon = True
                 self.lichess_polling_thread.start()
@@ -699,7 +689,6 @@ class ChessAssistant:
                 self.lichess_status_label.config(text=f"Status: {error_msg}")
                 self.status_label.config(text=error_msg)
                 
-                # Re-enable connect button
                 self.lichess_connect_button.config(state=tk.NORMAL)
                 self.lichess_disconnect_button.config(state=tk.DISABLED)
         except Exception as e:
@@ -708,7 +697,6 @@ class ChessAssistant:
             self.lichess_status_label.config(text=f"Status: Error - {error_msg}")
             self.status_label.config(text=error_msg)
         
-            # Re-enable connect button
             self.lichess_connect_button.config(state=tk.NORMAL)
             self.lichess_disconnect_button.config(state=tk.DISABLED)
     
@@ -718,14 +706,12 @@ class ChessAssistant:
             return
             
         try:
-            # Stop polling on the server
             response = requests.post(f"{lichess_server_url}/api/stop-polling")
             
             self.polling_active = False
             self.lichess_status_label.config(text="Status: Disconnected from Lichess")
             self.status_label.config(text="Disconnected from Lichess")
             
-            # Re-enable connect button, disable disconnect button
             self.lichess_connect_button.config(state=tk.NORMAL)
             self.lichess_disconnect_button.config(state=tk.DISABLED)
         except Exception as e:
@@ -735,18 +721,15 @@ class ChessAssistant:
     
     
     def analyze_position_from_fen(self, fen):
-            """Analyze the position after the board has been updated"""
             try:
                 self.status_label.config(text="Your turn - Analyzing position...")
                 
-                # Analyze the position
                 if self.auto_analyze_var.get():
                     self.analyze_current_position()
             except Exception as e:
                 print(f"Error analyzing position: {e}")
             
     def update_position_from_fen(self, fen):
-            """Update the board position from a FEN string and analyze it"""
             try:
                 if fen:
                     self.fen_entry.delete(0, tk.END)
@@ -763,13 +746,11 @@ class ChessAssistant:
     
     
     def check_for_game_updates(self):
-        """Periodically check for updates from the Lichess server"""
         last_fen = None
         last_game_id = None
         
         while self.polling_active:
             try:
-                # Get the current polling status
                 response = requests.get(f"{lichess_server_url}/api/polling-status")
                 if response.status_code == 200:
                     status_data = response.json()
@@ -779,28 +760,21 @@ class ChessAssistant:
                     current_game_id = status_data.get("currentGameId")
                     board_updated = status_data.get("boardUpdated", False)
                     
-                    # Update the UI based on game status
                     if current_game_id:
-                        # We have an active game
                         if not self.lichess_game_active or current_game_id != last_game_id:
-                            # New game detected
                             self.lichess_game_active = True
                             self.root.after(0, lambda gid=current_game_id: self.update_game_active_state(True, gid))
                             last_game_id = current_game_id
                         
-                        # Update board position when the position has changed (regardless of turn)
                         if current_fen and current_fen != last_fen and board_updated:
                             last_fen = current_fen
                             print(f"Board updated with FEN: {current_fen}, My turn: {is_my_turn}")
                             
-                            # Always update the board visually
                             self.root.after(0, lambda fen=current_fen: self.update_board_position(fen))
                             
-                            # Only analyze and show best move if it's my turn
                             if is_my_turn:
                                 self.root.after(100, lambda fen=current_fen: self.analyze_position_from_fen(fen))
                     else:
-                        # No active game
                         if self.lichess_game_active:
                             self.lichess_game_active = False
                             self.root.after(0, lambda: self.update_game_active_state(False))
@@ -815,11 +789,9 @@ class ChessAssistant:
             except Exception as e:
                 print(f"Error checking game updates: {e}")
             
-            # Wait before checking again
             time.sleep(1)
     
     def update_board_position(self, fen):
-        """Update the board position from a FEN string without analyzing"""
         try:
             if fen:
                 self.fen_entry.delete(0, tk.END)
@@ -827,7 +799,6 @@ class ChessAssistant:
                 
                 self.load_fen()
                 
-                # Hide the no-game message if it's visible
                 self.board_canvas.delete("message")
         except Exception as e:
             print(f"Error updating board position: {e}")
@@ -835,7 +806,6 @@ class ChessAssistant:
         
     
     def __del__(self):
-        """Clean up resources"""
         if hasattr(self, 'engine'):
             try:
                 self.engine.quit()
@@ -849,32 +819,24 @@ class ChessAssistant:
                 pass
             
     def update_game_active_state(self, is_active, game_id=None):
-        """Update the UI to reflect if a game is active or not"""
         if is_active and game_id:
-            # Show game active state
             self.lichess_status_label.config(text=f"Status: Active game - {game_id}")
             
-            # Show analysis section
             self.tab_control.pack(expand=1, fill=tk.BOTH, pady=10)
             self.move_label.config(text="Waiting for your turn...")
             
-            # Enable buttons
             self.analyze_button.config(state=tk.NORMAL)
             
-            # Clear any previous message
             if hasattr(self, 'no_game_label') and self.no_game_label:
                 self.no_game_label.pack_forget()
                 
         else:
-            # Show no game state
             self.lichess_status_label.config(text="Status: Connected to Lichess - No active game")
             
-            # Clear the current analysis
             self.explanation_text.delete(1.0, tk.END)
             self.detailed_text.delete(1.0, tk.END)
             self.move_label.config(text="No active game")
             
-            # Display message in the board area
             if not hasattr(self, 'no_game_label') or not self.no_game_label:
                 self.no_game_label = tk.Label(
                     self.board_canvas,
@@ -885,10 +847,8 @@ class ChessAssistant:
                 )
                 self.board_canvas.create_window(200, 200, window=self.no_game_label)
             else:
-                # Just make sure it's visible
                 self.board_canvas.create_window(200, 200, window=self.no_game_label)
                 
-            # Set the board to starting position but don't analyze
             self.board = chess.Board()
             self.draw_board()
             self.fen_entry.delete(0, tk.END)
