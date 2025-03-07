@@ -1,5 +1,7 @@
 # Chess Position Monitor - run on ur conputer easy
 
+<a href='https://www.youtube.com/watch?v=46zSw3E4_zg&t=11s'>Watch Demo</a> 
+
 <h1>follow these easy steps and you will have chess analyzer running</h1>
 
 1) get api from lichess.org and attach to server in express-serverless/api
